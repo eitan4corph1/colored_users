@@ -1,0 +1,14 @@
+{
+  "name": "Colored users",
+  "description": "Display user posts name in color",
+  "version": "1.0",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": [
+        "https://rotter.net/forum/scoops1/*"
+      ]
+    }
+  ]
+}
