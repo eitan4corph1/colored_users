@@ -2,7 +2,18 @@ const article = document.querySelector("a");
 
 console.log("start");
 
+let user_colors = new Map();
 
+user_colors.set("pedro", "red");
+user_colors.set("צ'מפי", "blue");
+user_colors.set("Compoti", "green");
+user_colors.set("Lucky", "blue");
+
+function color_user(element, user) {
+    if (user_colors.has(user)) {
+        element.style.color = user_colors.get(user);
+    }
+}
 
 let tables = document.getElementsByTagName("TABLE");
 
@@ -19,7 +30,8 @@ for (let x = 0; x < tables.length; x++) {
                 user_name = td[td.length - 3].textContent;
                 console.log("id/user: ", user_id, ": ", user_name);
                 let font = td[td.length - 3].getElementsByTagName("font");
-                font[0].style.color = "red";
+                //font[0].style.color = "red";
+                color_user(font[0], user_name);
             }
         }
     }
@@ -35,7 +47,8 @@ for (let x = 0; x < inputs.length; x++) {
     if (myname && !isNaN(myname)) {
         let user = inputs[x].textContent;
         console.log("user name messgae: ", user);
-        inputs[x].style.color = "red";
+        //inputs[x].style.color = "red";
+        color_user(inputs[x], user);
     }
 }
 
