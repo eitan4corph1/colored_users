@@ -3,9 +3,17 @@
   "description": "Display user posts name in color",
   "version": "1.0",
   "manifest_version": 3,
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "service_worker":  "background.js"
+  },
   "content_scripts": [
     {
-      "js": ["content.js"],
+      "js": [
+        "content.js"
+      ],
       "matches": [
         "https://rotter.net/forum/scoops1/*"
       ]

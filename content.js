@@ -1,13 +1,38 @@
-const article = document.querySelector("a");
 
-console.log("start");
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+}
+
+
+console.log("start 1");
+
+const userColor_DB = "user_colors_db";
+
 
 let user_colors = new Map();
-
 user_colors.set("pedro", "red");
 user_colors.set("צ'מפי", "blue");
 user_colors.set("Compoti", "green");
 user_colors.set("Lucky", "blue");
+
+console.log("Set: ", user_colors);
+
+chrome.storage.local.set({ user_colors_db: JSON.stringify(Array.from(user_colors.entries())) });
+
+let promise_get = chrome.storage.local.get(["user_colors_db"]);
+promise_get.then(
+    function (value) {
+        console.log("get", value);
+        let user_colors_loaded = new Map(JSON.parse(value.user_colors_db));
+        console.log("Loaded: ", user_colors_loaded);
+    },
+    function (error) { console.log("get", error); }
+);
+
 
 function color_user(element, user) {
     if (user_colors.has(user)) {
