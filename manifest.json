@@ -4,10 +4,14 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": [
-    "storage"
+    "storage",
+    "contextMenus"
   ],
   "background": {
     "service_worker":  "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
   },
   "content_scripts": [
     {
@@ -18,5 +22,19 @@
         "https://rotter.net/forum/scoops1/*"
       ]
     }
-  ]
+  ],
+  "commands": {
+    "set_red": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+3"
+      },
+      "description": "Set red"
+    },
+    "set_blue": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+4"
+      },
+      "description": "Set blue"
+    }  
+  }
 }
