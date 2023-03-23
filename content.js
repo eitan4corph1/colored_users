@@ -14,14 +14,14 @@ const userColor_DB = "user_colors_db";
 
 
 let user_colors = new Map();
-user_colors.set("pedro", "red");
-user_colors.set("צ'מפי", "blue");
-user_colors.set("Compoti", "green");
-user_colors.set("Lucky", "blue");
+// user_colors.set("pedro", "red");
+// user_colors.set("צ'מפי", "blue");
+// user_colors.set("Compoti", "green");
+// user_colors.set("Lucky", "blue");
 
-console.log("Set: ", user_colors);
+// console.log("Set: ", user_colors);
 
-chrome.storage.local.set({ user_colors_db: JSON.stringify(Array.from(user_colors.entries())) });
+// chrome.storage.local.set({ user_colors_db: JSON.stringify(Array.from(user_colors.entries())) });
 
 let promise_get = chrome.storage.local.get(["user_colors_db"]);
 promise_get.then(
@@ -29,8 +29,12 @@ promise_get.then(
         console.log("get", value);
         let user_colors_loaded = new Map(JSON.parse(value.user_colors_db));
         console.log("Loaded: ", user_colors_loaded);
+        user_colors = user_colors_loaded;
+        color_all_users();
     },
-    function (error) { console.log("get", error); }
+    function (error) {
+        console.log("get", error);
+    }
 );
 
 
@@ -40,40 +44,62 @@ function color_user(element, user) {
     }
 }
 
-let tables = document.getElementsByTagName("TABLE");
+function color_all_users() {
+    let tables = document.getElementsByTagName("TABLE");
 
-console.log("tables tags: ", tables.length);
+    console.log("tables tags: ", tables.length);
 
-for (let x = 0; x < tables.length; x++) {
-    let th = tables[x].getElementsByTagName("th");
-    if (th.length == 4 && th[0].textContent.search("האשכול") >= 0) {
-        let tr = tables[x].getElementsByTagName("tr");
-        for (let y = 0; y < tr.length; y++) {
-            let td = tr[y].getElementsByTagName("td");
-            if (td.length >= 3) {
-                user_id = td[td.length - 1].textContent;
-                user_name = td[td.length - 3].textContent;
-                console.log("id/user: ", user_id, ": ", user_name);
-                let font = td[td.length - 3].getElementsByTagName("font");
-                //font[0].style.color = "red";
-                color_user(font[0], user_name);
+    for (let x = 0; x < tables.length; x++) {
+        let th = tables[x].getElementsByTagName("th");
+        if (th.length == 4 && th[0].textContent.search("האשכול") >= 0) {
+            let tr = tables[x].getElementsByTagName("tr");
+            for (let y = 0; y < tr.length; y++) {
+                let td = tr[y].getElementsByTagName("td");
+                if (td.length >= 3) {
+                    user_id = td[td.length - 1].textContent;
+                    user_name = td[td.length - 3].textContent;
+                    console.log("id/user: ", user_id, ": ", user_name);
+                    let font = td[td.length - 3].getElementsByTagName("font");
+                    //font[0].style.color = "red";
+                    color_user(font[0], user_name);
+                }
             }
+        }
+    }
+
+
+    let inputs = document.getElementsByTagName("a");
+
+    console.log("a tags: ", inputs.length);
+
+    for (let x = 0; x < inputs.length; x++) {
+        let myname = inputs[x].getAttribute("name");
+        if (myname && !isNaN(myname)) {
+            let user = inputs[x].textContent;
+            console.log("user name messgae: ", user);
+            //inputs[x].style.color = "red";
+            color_user(inputs[x], user);
         }
     }
 }
 
+// color_all_users();
 
-let inputs = document.getElementsByTagName("a");
-
-console.log("a tags: ", inputs.length);
-
-for (let x = 0; x < inputs.length; x++) {
-    let myname = inputs[x].getAttribute("name");
-    if (myname && !isNaN(myname)) {
-        let user = inputs[x].textContent;
-        console.log("user name messgae: ", user);
-        //inputs[x].style.color = "red";
-        color_user(inputs[x], user);
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log('from background script: ' + message)
+    user = message[0];
+    color = message[1];
+    console.log('user: ' + user)
+    console.log('color: ' + color)
+    if (color == "color_red") {
+        user_color = "red"
+    } else if (color == "color_blue") {
+        user_color = "blue"
     }
-}
-
+    else if (color == "color_green") {
+        user_color = "green"
+    }
+    user_colors.set(user, user_color);
+    color_all_users();
+    chrome.storage.local.set({ user_colors_db: JSON.stringify(Array.from(user_colors.entries())) });
+});

@@ -25,11 +25,11 @@ chrome.runtime.onInstalled.addListener(() => {
         contexts: ["selection"]
     });
     chrome.contextMenus.create({
-        id: "colorgreen",
+        id: "color_green",
         title: "ColorGreen",
         parentId: parent,
         contexts: ["selection"]
-    });        
+    });
 });
 
 
@@ -41,4 +41,5 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     console.log(info.menuItemId);
     console.log(info.selectionText);
     console.log(tab);
+    chrome.tabs.sendMessage(tab.id, [info.selectionText, info.menuItemId]);
 });
