@@ -30,6 +30,38 @@ chrome.runtime.onInstalled.addListener(() => {
         parentId: parent,
         contexts: ["selection"]
     });
+    chrome.contextMenus.create({
+        id: "separator1",
+        parentId: parent,
+        type: "separator",
+        contexts: ["selection"]
+    });
+    chrome.contextMenus.create({
+        id: "backup",
+        title: "Backup",
+        parentId: parent,
+        contexts: ["selection"]
+    });
+    chrome.contextMenus.create({
+        id: "restore",
+        title: "Restore",
+        parentId: parent,
+        contexts: ["selection"]
+    });
+    chrome.contextMenus.create({
+        id: "separator2",
+        parentId: parent,
+        type: "separator",
+        contexts: ["selection"]
+    });
+    chrome.contextMenus.create({
+        id: "reset",
+        title: "Reset",
+        parentId: parent,
+        contexts: ["selection"]
+    });
+
+
 });
 
 

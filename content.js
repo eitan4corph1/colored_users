@@ -11,6 +11,7 @@ function sleep(milliseconds) {
 console.log("start 1");
 
 const userColor_DB = "user_colors_db";
+const userColor_DB_backup = "user_colors_db_backup";
 
 
 let user_colors = new Map();
@@ -23,19 +24,36 @@ let user_colors = new Map();
 
 // chrome.storage.local.set({ user_colors_db: JSON.stringify(Array.from(user_colors.entries())) });
 
-let promise_get = chrome.storage.local.get(["user_colors_db"]);
-promise_get.then(
-    function (value) {
-        console.log("get", value);
-        let user_colors_loaded = new Map(JSON.parse(value.user_colors_db));
-        console.log("Loaded: ", user_colors_loaded);
-        user_colors = user_colors_loaded;
-        color_all_users();
-    },
-    function (error) {
-        console.log("get", error);
+function read_db(use_backup = false) {
+    if (use_backup) {
+        db_name = userColor_DB_backup;
+    } else {
+        db_name = userColor_DB;
     }
-);
+    let promise_get = chrome.storage.local.get([db_name]);
+    promise_get.then(
+        function (value) {
+            console.log("get", value);
+            let user_colors_loaded = new Map(JSON.parse(value[db_name]));
+            console.log("Loaded: ", user_colors_loaded);
+            user_colors = user_colors_loaded;
+            color_all_users();
+        },
+        function (error) {
+            console.log("get", error);
+        }
+    );
+}
+
+function save_db(use_backup = false) {
+    if (use_backup) {
+        db_name = userColor_DB_backup;
+    } else {
+        db_name = userColor_DB;
+    }
+    chrome.storage.local.set({ [db_name]: JSON.stringify(Array.from(user_colors.entries())) });
+
+}
 
 
 function color_user(element, user) {
@@ -85,21 +103,37 @@ function color_all_users() {
 
 // color_all_users();
 
+read_db();
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('from background script: ' + message)
     user = message[0];
-    color = message[1];
+    command = message[1];
     console.log('user: ' + user)
-    console.log('color: ' + color)
-    if (color == "color_red") {
+    console.log('command: ' + command)
+    if (command == "color_red") {
         user_color = "red"
-    } else if (color == "color_blue") {
+    } else if (command == "color_blue") {
         user_color = "blue"
     }
-    else if (color == "color_green") {
+    else if (command == "color_green") {
         user_color = "green"
     }
+    else if (command == "backup") {
+        save_db(use_backup = true);
+        return;
+    }
+    else if (command == "restore") {
+        read_db(use_backup = true);
+        save_db();
+    }
+    else if (command == "reset") {
+        user_colors = new Map();
+        save_db();
+    }
+
+
     user_colors.set(user, user_color);
     color_all_users();
-    chrome.storage.local.set({ user_colors_db: JSON.stringify(Array.from(user_colors.entries())) });
+    save_db();
 });
