@@ -13,46 +13,27 @@ console.log("start 1");
 const userColor_DB = "user_colors_db";
 const userColor_DB_backup = "user_colors_db_backup";
 
-
 let user_colors = new Map();
-// user_colors.set("pedro", "red");
-// user_colors.set("צ'מפי", "blue");
-// user_colors.set("Compoti", "green");
-// user_colors.set("Lucky", "blue");
+read_db();
 
-// console.log("Set: ", user_colors);
 
-// chrome.storage.local.set({ user_colors_db: JSON.stringify(Array.from(user_colors.entries())) });
-
-function read_db(use_backup = false) {
-    if (use_backup) {
-        db_name = userColor_DB_backup;
-    } else {
-        db_name = userColor_DB;
-    }
-    let promise_get = chrome.storage.local.get([db_name]);
-    promise_get.then(
-        function (value) {
-            console.log("get", value);
-            let user_colors_loaded = new Map(JSON.parse(value[db_name]));
-            console.log("Loaded: ", user_colors_loaded);
-            user_colors = user_colors_loaded;
-            color_all_users();
-        },
-        function (error) {
-            console.log("get", error);
-        }
-    );
+async function read_db(use_backup = false) {
+    let db_name = use_backup ? userColor_DB_backup : userColor_DB;
+    console.log("read_db: ", db_name);
+    const response = await chrome.storage.local.get([db_name]);
+    console.log("read_db get", response);
+    let user_colors_loaded = new Map(JSON.parse(response[db_name]));
+    console.log("read_db Loaded: ", user_colors_loaded);
+    user_colors = user_colors_loaded;
+    color_all_users();
 }
 
-function save_db(use_backup = false) {
-    if (use_backup) {
-        db_name = userColor_DB_backup;
-    } else {
-        db_name = userColor_DB;
-    }
-    chrome.storage.local.set({ [db_name]: JSON.stringify(Array.from(user_colors.entries())) });
 
+async function save_db(use_backup = false) {
+    let db_name = use_backup ? userColor_DB_backup : userColor_DB;
+    console.log("save_db: ", db_name, user_colors);
+    await chrome.storage.local.set({ [db_name]: JSON.stringify(Array.from(user_colors.entries())) });
+    console.log("save_db finished: ", db_name);
 }
 
 
@@ -76,9 +57,8 @@ function color_all_users() {
                 if (td.length >= 3) {
                     user_id = td[td.length - 1].textContent;
                     user_name = td[td.length - 3].textContent;
-                    console.log("id/user: ", user_id, ": ", user_name);
+                    //console.log("id/user: ", user_id, ": ", user_name);
                     let font = td[td.length - 3].getElementsByTagName("font");
-                    //font[0].style.color = "red";
                     color_user(font[0], user_name);
                 }
             }
@@ -94,16 +74,16 @@ function color_all_users() {
         let myname = inputs[x].getAttribute("name");
         if (myname && !isNaN(myname)) {
             let user = inputs[x].textContent;
-            console.log("user name messgae: ", user);
-            //inputs[x].style.color = "red";
+            //console.log("user name messgae: ", user);
             color_user(inputs[x], user);
         }
     }
 }
 
-// color_all_users();
-
-read_db();
+async function restore() {
+    await read_db(use_backup = true);
+    save_db();
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('from background script: ' + message)
@@ -111,6 +91,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     command = message[1];
     console.log('user: ' + user)
     console.log('command: ' + command)
+
+    if (command == "backup") {
+        save_db(use_backup = true);
+        return;
+    }
+    if (command == "restore") {
+        restore();
+        return;
+    }
+    if (command == "reset") {
+        user_colors = new Map();
+        color_all_users();
+        save_db();
+        return;
+    }
+
     if (command == "color_red") {
         user_color = "red"
     } else if (command == "color_blue") {
@@ -119,19 +115,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     else if (command == "color_green") {
         user_color = "green"
     }
-    else if (command == "backup") {
-        save_db(use_backup = true);
-        return;
-    }
-    else if (command == "restore") {
-        read_db(use_backup = true);
-        save_db();
-    }
-    else if (command == "reset") {
-        user_colors = new Map();
-        save_db();
-    }
-
 
     user_colors.set(user, user_color);
     color_all_users();
