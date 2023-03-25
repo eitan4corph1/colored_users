@@ -5,12 +5,14 @@ chrome.commands.onCommand.addListener(command => {
 
 ///////////////
 
+var showForPages = ["https://rotter.net/forum/scoops1/*"];
 
 chrome.runtime.onInstalled.addListener(() => {
     let parent = chrome.contextMenus.create({
         id: "color_user",
         title: "ColorUsers",
-        contexts: ["selection"]
+        contexts: ["selection"],
+        documentUrlPatterns: showForPages
     });
     chrome.contextMenus.create({
         id: "color_red",
