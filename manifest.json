@@ -1,6 +1,6 @@
 {
   "name": "Colored users",
-  "description": "Display user posts name in color",
+  "description": "Display user post name in color",
   "version": "1.0",
   "manifest_version": 3,
   "permissions": [
@@ -9,9 +9,6 @@
   ],
   "background": {
     "service_worker": "background.js"
-  },
-  "action": {
-    "default_popup": "popup.html"
   },
   "content_scripts": [
     {
@@ -23,20 +20,6 @@
       ]
     }
   ],
-  "commands": {
-    "set_red": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+3"
-      },
-      "description": "Set red"
-    },
-    "set_blue": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+4"
-      },
-      "description": "Set blue"
-    }
-  },
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",

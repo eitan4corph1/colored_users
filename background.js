@@ -1,10 +1,4 @@
 
-chrome.commands.onCommand.addListener(command => {
-    console.log("Command:", command);
-});
-
-///////////////
-
 var showForPages = ["https://rotter.net/forum/scoops1/*"];
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -62,14 +56,8 @@ chrome.runtime.onInstalled.addListener(() => {
         parentId: parent,
         contexts: ["selection"]
     });
-
-
 });
 
-
-chrome.contextMenus.onClicked.addListener(function (clickData) {
-    console.log(clickData.menuItemId);
-})
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     console.log(info.menuItemId);
