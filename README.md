@@ -1,5 +1,6 @@
 # Rotter color users
-### Chrome extension for rotter.net scoops
+
+Chrome extension for rotter.net scoops
 
 ##### Features:
   - Color the user posts.
